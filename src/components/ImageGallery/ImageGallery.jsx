@@ -1,32 +1,89 @@
 import { Component } from 'react';
-// import axios from 'axios';
+import axios from 'axios';
+import { ThreeCircles } from 'react-loader-spinner';
+import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 
-// axios.defaults.baseURL = 'https://pixabay.com/api/';
-// const API_KEY = '34521727-b40265d11824baf1c84600c97';
+axios.defaults.baseURL = 'https://pixabay.com/api/';
+const API_KEY = '34521727-b40265d11824baf1c84600c97';
 
 export class ImageGallery extends Component {
-  componentDidUpdate(prevProps, prevState) {
-    // if (prevProps.searchQuery !== this.props.searchQuery) {
-    //   console.log(prevProps.searchQuery);
-    //   console.log(this.props.searchQuery);
-    //   console.log('change');
-    // }
-    if (prevProps.images !== this.props.images) {
-      console.log(prevProps.images);
-      console.log(this.props.images);
-      console.log('change');
+  state = {
+    images: [],
+    isLoading: false,
+    error: null,
+  };
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (prevProps.searchQuery !== this.props.searchQuery) {
+      this.setState({ isLoading: true, images: [] });
+
+      try {
+        const response = await axios.get(
+          `/?q=${this.props.searchQuery}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+        );
+        this.setState({
+          images: response.data.hits,
+        });
+      } catch (error) {
+        this.setState({ error });
+      } finally {
+        this.setState({ isLoading: false });
+      }
     }
   }
 
   render() {
+    const { error, isLoading, images } = this.state;
     return (
-      <ul>
-        {this.props.images.map(({ id, webformatURL, largeImageURL }) => (
-          <li className="gallery-item" key={id}>
-            <img src={webformatURL} alt="" />
-          </li>
-        ))}
-      </ul>
+      <>
+        {!this.props.searchQuery && <p>Enter smth</p>}
+        {isLoading && (
+          <ThreeCircles
+            height="100"
+            width="100"
+            color="#4fa94d"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel="three-circles-rotating"
+            outerCircleColor=""
+            innerCircleColor=""
+            middleCircleColor=""
+          />
+        )}
+        {error && <p>Whoops, something went wrong: {error.message}</p>}
+        {images.length > 0 ? (
+          <ul>
+            {images.map(image => (
+              <ImageGalleryItem key={image.id} src={image.webformatURL} />
+            ))}
+          </ul>
+        ) : (
+          <p>Sorry, there is no images for your query</p>
+        )}
+      </>
     );
   }
 }
+
+// let prevSearchQuery = '';
+
+// async function fetchImages(searchQuery) {
+//   if (searchQuery === prevSearchQuery) {
+//     page += 1;
+//   } else {
+//     page = 1;
+//     prevSearchQuery = searchQuery;
+//   }
+//   const params = {
+//     q: `${searchQuery}`,
+//     image_type: 'photo',
+//     orientation: 'horizontal',
+//     safesearch: 'true',
+//     page: `${page}`,
+//     per_page: `${perPage}`,
+//   };
+
+//   const urlAXIOS = `?key=${API_KEY}`;
+
+//   const { data } = await axios.get(urlAXIOS, { params });
