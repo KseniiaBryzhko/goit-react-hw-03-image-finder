@@ -11,6 +11,10 @@ export class ImageGallery extends Component {
     images: [],
     isLoading: false,
     error: null,
+    page: 1,
+    perPage: 12,
+    totalResults: 0,
+    showGallery: false,
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -19,7 +23,7 @@ export class ImageGallery extends Component {
 
       try {
         const response = await axios.get(
-          `/?q=${this.props.searchQuery}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+          `/?q=${this.props.searchQuery}&page=${this.state.page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${this.state.perPage}`
         );
         this.setState({
           images: response.data.hits,
