@@ -1,9 +1,8 @@
-// import css from './FriendListItem.module.css';
-// import PropTypes from 'prop-types';
 import { Component } from 'react';
 import { ImSearch } from 'react-icons/im';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import css from './Searchbar.module.css';
 
 export class Searchbar extends Component {
   state = {
@@ -28,15 +27,15 @@ export class Searchbar extends Component {
   render() {
     const { searchQuery } = this.state;
     return (
-      <header className="searchbar">
-        <form className="form" onSubmit={this.handleFormSubmit}>
-          <button type="submit" className="button">
+      <header className={css.Searchbar}>
+        <form className={css.SearchForm} onSubmit={this.handleFormSubmit}>
+          <button type="submit" className={css.SearchFormButton}>
             <ImSearch />
-            <span className="button-label">Search</span>
+            <span className={css.SearchFormButtonLabel}>Search</span>
           </button>
 
           <input
-            className="input"
+            className={css.SearchFormInput}
             type="text"
             value={searchQuery}
             onChange={this.handleInputChange}
@@ -49,9 +48,3 @@ export class Searchbar extends Component {
     );
   }
 }
-
-// FriendListItem.propTypes = {
-//   avatar: PropTypes.string.isRequired,
-//   name: PropTypes.string.isRequired,
-//   isOnline: PropTypes.bool.isRequired,
-// };

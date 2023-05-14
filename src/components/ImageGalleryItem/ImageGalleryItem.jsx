@@ -1,16 +1,15 @@
-// import css from './FriendListItem.module.css';
-// import PropTypes from 'prop-types';
+import css from './ImageGalleryItem.module.css';
+import PropTypes from 'prop-types';
 
-export const ImageGalleryItem = ({ src }) => {
+export const ImageGalleryItem = ({ src, alt }) => {
   return (
-    <li className="gallery-item">
-      <img src={src} alt="" />
+    <li className={css.ImageGalleryItem}>
+      <img className={css.ImageGalleryItemImage} src={src} alt={alt} />
     </li>
   );
 };
 
-// FriendListItem.propTypes = {
-//   avatar: PropTypes.string.isRequired,
-//   name: PropTypes.string.isRequired,
-//   isOnline: PropTypes.bool.isRequired,
-// };
+ImageGalleryItem.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired,
+};
