@@ -1,93 +1,92 @@
 import { Component } from 'react';
-import axios from 'axios';
-import { ThreeCircles } from 'react-loader-spinner';
+import { Loader } from '../Loader/Loader';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
-
-axios.defaults.baseURL = 'https://pixabay.com/api/';
-const API_KEY = '34521727-b40265d11824baf1c84600c97';
+import { Searchbar } from '../Searchbar/Searchbar';
+import * as ImageService from 'service/image-service';
+import { Button } from '../Button/Button';
 
 export class ImageGallery extends Component {
   state = {
-    images: [],
-    isLoading: false,
-    error: null,
+    query: '',
     page: 1,
+    images: [],
     perPage: 12,
     totalResults: 0,
+    error: null,
     showGallery: false,
+    isLoading: false,
   };
 
-  async componentDidUpdate(prevProps, prevState) {
-    if (prevProps.searchQuery !== this.props.searchQuery) {
-      this.setState({ isLoading: true, images: [] });
-
-      try {
-        const response = await axios.get(
-          `/?q=${this.props.searchQuery}&page=${this.state.page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${this.state.perPage}`
-        );
-        this.setState({
-          images: response.data.hits,
-        });
-      } catch (error) {
-        this.setState({ error });
-      } finally {
-        this.setState({ isLoading: false });
-      }
+  componentDidUpdate(prevProps, prevState) {
+    const { query, page } = this.state;
+    if (prevState.query !== query || prevState.page !== page) {
+      this.getPhotos(query, page);
     }
   }
 
+  handleSubmit = data => {
+    this.setState({
+      query: data,
+      page: 1,
+      images: [],
+      perPage: 12,
+      totalResults: 0,
+      error: null,
+      showGallery: false,
+      isLoading: false,
+    });
+  };
+
+  getPhotos = async (query, page) => {
+    this.setState({ isLoading: true });
+    try {
+      const { hits, totalHits } = await ImageService.getImages(query, page);
+      this.setState(prevState => ({
+        images: [...prevState.images, ...hits],
+        totalResults: totalHits,
+      }));
+      if (hits.length === 0) {
+        this.setState({
+          showGallery: true,
+        });
+      }
+    } catch (error) {
+      this.setState({
+        error: error.message,
+      });
+      console.log(error);
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
+
+  handleLoadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
+
   render() {
-    const { error, isLoading, images } = this.state;
+    const { error, isLoading, images, totalResults, showGallery } = this.state;
     return (
       <>
-        {!this.props.searchQuery && <p>Enter smth</p>}
-        {isLoading && (
-          <ThreeCircles
-            height="100"
-            width="100"
-            color="#4fa94d"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-            ariaLabel="three-circles-rotating"
-            outerCircleColor=""
-            innerCircleColor=""
-            middleCircleColor=""
-          />
-        )}
+        <Searchbar onSubmit={this.handleSubmit} />
+
+        {showGallery && <p>Sorry, there is no images for your query</p>}
         {error && <p>Whoops, something went wrong: {error.message}</p>}
-        {images.length > 0 ? (
+        {isLoading && <Loader />}
+        {images.length > 0 && (
           <ul>
             {images.map(image => (
               <ImageGalleryItem key={image.id} src={image.webformatURL} />
             ))}
           </ul>
-        ) : (
-          <p>Sorry, there is no images for your query</p>
+        )}
+
+        {images.length > 0 && images.length < totalResults && (
+          <Button onClick={this.handleLoadMore} textChange={isLoading}></Button>
         )}
       </>
     );
   }
 }
-
-// let prevSearchQuery = '';
-
-// async function fetchImages(searchQuery) {
-//   if (searchQuery === prevSearchQuery) {
-//     page += 1;
-//   } else {
-//     page = 1;
-//     prevSearchQuery = searchQuery;
-//   }
-//   const params = {
-//     q: `${searchQuery}`,
-//     image_type: 'photo',
-//     orientation: 'horizontal',
-//     safesearch: 'true',
-//     page: `${page}`,
-//     per_page: `${perPage}`,
-//   };
-
-//   const urlAXIOS = `?key=${API_KEY}`;
-
-//   const { data } = await axios.get(urlAXIOS, { params });

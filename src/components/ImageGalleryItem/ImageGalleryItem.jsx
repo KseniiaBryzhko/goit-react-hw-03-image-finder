@@ -1,9 +1,9 @@
 // import css from './FriendListItem.module.css';
 // import PropTypes from 'prop-types';
 
-export const ImageGalleryItem = ({ key, src }) => {
+export const ImageGalleryItem = ({ src }) => {
   return (
-    <li className="gallery-item" key={key}>
+    <li className="gallery-item">
       <img src={src} alt="" />
     </li>
   );
