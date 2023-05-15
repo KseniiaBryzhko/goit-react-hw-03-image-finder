@@ -73,8 +73,14 @@ export class App extends Component {
     return (
       <div className={css.App}>
         <Searchbar onSubmit={this.handleSubmit} />
-        {showGallery && <p>Sorry, there is no images for your query</p>}
-        {error && <p>Whoops, something went wrong: {error.message}</p>}
+        {showGallery && (
+          <p className={css.Text}>Sorry, there is no images for your query</p>
+        )}
+        {error && (
+          <p className={css.Text}>
+            Whoops, something went wrong: {error.message}
+          </p>
+        )}
         {isLoading && <Loader />}
         {images.length > 0 && <ImageGallery images={images} />}
         {images.length > 0 && images.length < totalResults && (

@@ -4,3 +4,12 @@
   grid-gap: 16px;
   padding-bottom: 24px;
 }
+
+.Text {
+  text-align: center;
+  color: #353535;
+  font: inherit;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 20px auto;
+}
